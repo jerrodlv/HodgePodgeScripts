@@ -9,33 +9,119 @@ TO DO
  Gather input arguments to get file source and destination output
 #>
 
-$SourceFilePath = "C:\Users\getch\Downloads\export_srsdistribution_dev.json"
+$SourceFilePath = "C:\Users\getch\Downloads\jsontest_full.json"
 $SourceJSON = Get-Content $SourceFilePath  -Raw | ConvertFrom-Json
 
 #iterate through all of the JSON objects and put them into posh objects before export
 
 #ServerSettings
 $ServerSettings = $SourceJSON | Select-Object -Expand ServerSettings
-$ServerSettings | Get-Member -MemberType NoteProperty | `
-    Select-Object @{name='Name';expression={$_.name}}, `
-                  @{name='Value';expression={$ServerSettings.($_.name)}} `
- | Export-Excel -Path "C:\Users\getch\Downloads\test.xlsx" -WorksheetName "ServerSettings"
+$ServerSettings | Get-Member -MemberType NoteProperty |
+Select-Object @{name = 'Name'; expression = { $_.name } }, 
+@{name = 'Value'; expression = { $ServerSettings.($_.name) } } |
+Export-Excel -Path "C:\Users\getch\Downloads\test.xlsx" -WorksheetName "ServerSettings" 
 
- # Categories __NOT DONE
-$Categories = $SourceJSON | Select-Object -Expand Categories |  Select-Object -Expand Name | Select-Object -Expand stringMap `
-    foreach {
-        $_.en = $_.en -join ' ' `
+
+#Categories
+$CategoryResults = @()    
+$Categories = $SourceJSON | Select-Object -Expand Categories
+foreach ($Cat in $Categories) {
+    $CatResObj = @{
+        "Field Category" = $_.Name.stringMap.endpoint
+        AttributeID      = $_.Id
+        SortOrder        = $_.Index
     }
-    Select-Object @{name='Name';expression={$_.name}}, `
-                  @{name='Value';expression={$Categories.($_.name)}} `
- | Export-Excel -Path "C:\Users\getch\Downloads\test.xlsx" -WorksheetName "Categories"
+    $CategoryResults += New-Object PSObject -Property $CatResObj
+}
+
+$CategoryResults | Sort-Object -Property SortOrder | Export-Excel -Path "C:\Users\getch\Downloads\test.xlsx" -WorksheetName "Categories"
 
 
 
-#Entity Type parsing
- $EntityTypes =  $SourceJSON | Select-Object -Expand EntityTypes
-    ForEach ($ID in $EntityTypes) {     
-       $ID | Select-Object -Expand FieldTypes 
-       $ID | Get-Member -MemberType NoteProperty
+#Entity Types
+$EntityTypeResults = @()
+$EntityTypes = $SourceJSON | Select-Object -Expand EntityTypes
+ForEach ($EntityType in $EntityTypes) { 
+    foreach ($fieldType in ($EntityType | Select-Object -Expand FieldTypes)) {
+        #handle localized name object another time...
+        #$fieldType | Add-Member -NotePropertyName 'Name_en' -NotePropertyValue $fieldType.Name.stringMap.en
+        #$fieldType | Add-Member -NotePropertyName 'Description_en' -NotePropertyValue $fieldType.Description.stringMap.en
+        #$fieldType.PSObject.Properties.Remove('Name')
+        #$fieldType.PSObject.Properties.Remove('Description')
+        $EntityTypeResObj = @{
+            EntityTypeID           = $EntityType.iD
+            FieldTypeID            = $fieldType.id
+            Name                   = $fieldType.Name.stringMap.en
+            Description            = $fieldType.Description.stringMap.en
+            DataType               = $fieldType.DataType
+            SortOrder              = $fieldType.Index
+            CVLId                  = $fieldType.CVLId
+            DefaultValue           = $fieldType.DefaultValue
+            Mandatory              = $fieldType.Mandatory
+            ReadOnly               = $fieldType.ReadOnly
+            Multivalue             = $fieldType.Multivalue
+            Unique                 = $fieldType.Unique
+            Hidden                 = $fieldType.Hidden
+            ExcludeFromDefaultView = $fieldType.ExcludeFromDefaultView
+            TrackChanges           = $fieldType.TrackChanges
+            CategoryID             = $fieldType.CategoryId
+        }
+        $EntityTypeResults += New-Object PSObject -Property $EntityTypeResObj
+    } 
+    $EntityTypeResults | 
+    Select-Object EntityTypeID, FieldTypeID, Name, Description, DataType, SortOrder, CVLId, DefaultValue, Mandatory, ReadOnly, Multivalue, Unique, Hidden, ExcludeFromDefaultView, TrackChanges, CategoryID |
+    Sort-Object -Property SortOrder | 
+    Export-Excel -Path "C:\Users\getch\Downloads\test.xlsx" -WorksheetName $EntityType.Id
+}
+
+
+
+ 
+#FieldSet
+$FSresults = @()
+$FieldSets = $SourceJSON | Select-Object -Expand FieldSets
+ForEach ($FS in $FieldSets) {
+    Foreach ($FieldType in ($FS | Select-Object -Expand FieldTypes)) {
+        $FieldSetObj = @{
+            FieldSetID   = $FS.Id
+            FieldSetName = $FS.Name.stringMap.en
+            EntityTypeID = $FS.EntityTypeID
+            "Field Key"  = $FieldType
+            Description  = $FS.Description.stringMap.en 
+        }
+        $FSresults += New-Object PSObject -Property $FieldSetObj
     }
+};  
+$FSresults | Export-Excel -Path "C:\Users\getch\Downloads\test.xlsx" -WorksheetName FieldSets
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+$EntityType | Select-Object -Expand FieldTypes | 
+Select-Object EntityTypeID, 
+@{label = "FieldTypeID"; expression = { $_.Id } },
+Name_en,
+@{label = "Sort Order"; expression = { $_.Index } },
+DataType,
+CVLId,
+DefaultValue,
+Mandatory,
+ReadOnly,
+Multivalue,
+Unique,
+Hidden,
+ExcludeFromDefaultView,
+TrackChanges,
+CategoryID | 

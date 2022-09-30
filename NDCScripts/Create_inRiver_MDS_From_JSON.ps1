@@ -94,34 +94,3 @@ ForEach ($FS in $FieldSets) {
 };  
 $FSresults | Export-Excel -Path "C:\Users\getch\Downloads\test.xlsx" -WorksheetName FieldSets
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-$EntityType | Select-Object -Expand FieldTypes | 
-Select-Object EntityTypeID, 
-@{label = "FieldTypeID"; expression = { $_.Id } },
-Name_en,
-@{label = "Sort Order"; expression = { $_.Index } },
-DataType,
-CVLId,
-DefaultValue,
-Mandatory,
-ReadOnly,
-Multivalue,
-Unique,
-Hidden,
-ExcludeFromDefaultView,
-TrackChanges,
-CategoryID | 

@@ -147,10 +147,10 @@ ForEach ($EntityType in $SourceJSON | Select-Object -Expand EntityTypes) {
         $settings = $fieldType | Select-Object -Expand Settings   
         foreach ($setting in $settings) {
             $setting | Get-Member -MemberType NoteProperty | 
-            % Name | 
-            % { Add-Member -InputObject $fieldType -NotePropertyName ("Setting." + $_) -NotePropertyValue $setting.$_ -Force } 
+            ForEach-Object Name | 
+            ForEach-Object { Add-Member -InputObject $fieldType -NotePropertyName ("Setting." + $_) -NotePropertyValue $setting.$_ -Force } 
         }
-        $fieldType.PSObject.Properties | Where-Object Name -like "Setting.*" | foreach { $fieldTypeSettingRes[$_.Name] = $_.Value }
+        $fieldType.PSObject.Properties | Where-Object Name -like "Setting.*" | ForEach-Object { $fieldTypeSettingRes[$_.Name] = $_.Value }
         
         $EntityTypeResObj = [ordered] @{
             EntityTypeID           = $EntityType.iD

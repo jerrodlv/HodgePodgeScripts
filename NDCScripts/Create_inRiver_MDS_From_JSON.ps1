@@ -77,7 +77,7 @@ $SourceFilePath = ""
 #Get the excel save to file location
 $ExcelSaveToFile = ""
 :SaveToFile while ($true) {
-    $ExcelSaveToFile = Read-Host -Prompt "Please enter a filename and path where to save the output (include file name and ext. eg. C:\users\user\downloads\excel.xslx)"
+    $ExcelSaveToFile = Read-Host -Prompt "Please enter a filename and path where to save the output (include file name and ext. eg. C:\users\user\downloads\excel.xlsx)"
     if (Test-Path -Path $ExcelSaveToFile -IsValid) { 
         if (Test-Path -Path $ExcelSaveToFile) {
             $title = 'Confirm File Overwrite..'
@@ -261,15 +261,10 @@ Write-Host "Exported CVL's to file" -ForegroundColor Green
 
 
 
-<# open the file... 
-doesn't seem to want to cooperate. maybe do this later
-
-$openFile = Read-Host "Complete. Would you like to open the file?"
 $title    = 'Open File?'
 $question = 'Complete. Would you like to open the file?'
-$choices  = '&Yes', '&No'
+$choices = '&Yes', '&No'
 $decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
 if ($decision -eq 0) {
-    $Excel = New-Object -ComObject Excel.Application
-    $workbook = $Excel.Workbooks.Open($ExcelExportArgs.path)
-}#>
+    start excel $ExcelSaveToFile
+}

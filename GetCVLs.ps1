@@ -1,6 +1,6 @@
 $headers = @{
     "Accept" = "application/json";
-    "X-inRiver-APIKey" = "a2738738dfbf63809c574d6d181e44f7"
+    "X-inRiver-APIKey" = "" #Insert API kEY
 }
 $GetStructureURI = "https://apiuse.productmarketingcloud.com/api/v1.0.0/model/cvls"
 

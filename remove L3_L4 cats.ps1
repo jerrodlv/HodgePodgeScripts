@@ -5,9 +5,9 @@ $L3Array = @()
 $results = @()
 $headers = @{
     "Accept" = "application/json";
-    "X-inRiver-APIKey" = "a2738738dfbf63809c574d6d181e44f7"
+    "X-inRiver-APIKey" = "" #Insert API KEY
 }
-$ChannelID = "113323"
+$ChannelID = "113323" #insert the channel ID from inriver
 $GetStructureURI = "https://apiuse.productmarketingcloud.com/api/v1.0.0/channels/$ChannelID/nodes"
 
 #Invoke-RestMethod -Method:Get -Headers $headers -URI $GetStructureURI 
@@ -72,6 +72,7 @@ $results | Select-Object ChannelNodeUniqueValue, Field, @{label = "Equals";expre
 
 #$csvoutputpath = "C:\Users\getch\Luminos Labs\Luminos Labs - Clients\NDC\Client Shared - NDC\inRiver\Import Files\Model Import Files\NodeLinkRules_09062022152122.csv"
 #call the improt routines to load the link rules that we exported to csv. 
+#Insert email and pass for the environment below. 
 & C:\LLInRiverToolkit\ImportToolkit\LL.InRiver.ImportToolkits.exe addlinkdefinitions `
      -c "Preferred Medical" `
      -u "ChannelNodeID" `
@@ -79,6 +80,6 @@ $results | Select-Object ChannelNodeUniqueValue, Field, @{label = "Equals";expre
      -i $csvoutputpath `
      -r `
      -e test `
-     --user jerrod_ndc@luminoslabs.com `
-     --pass "yygJh94NnK@e@o" `
+     --user "" `
+     --pass "" `
      --url https://remoting.productmarketingcloud.com

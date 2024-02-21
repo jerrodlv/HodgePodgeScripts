@@ -266,5 +266,5 @@ $question = 'Complete. Would you like to open the file?'
 $choices = '&Yes', '&No'
 $decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
 if ($decision -eq 0) {
-    start excel $ExcelSaveToFile
+    start excel  '"$ExcelSaveToFile"' 
 }
